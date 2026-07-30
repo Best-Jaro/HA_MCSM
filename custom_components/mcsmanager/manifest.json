@@ -1,0 +1,13 @@
+{
+  "domain": "mcsmanager",
+  "name": "MCSManager",
+  "version": "1.0.0",
+  "config_flow": true,
+  "documentation": "https://github.com/YOUR_USERNAME/ha-mcsmanager",
+  "issue_tracker": "https://github.com/YOUR_USERNAME/ha-mcsmanager/issues",
+  "dependencies": [],
+  "codeowners": ["@Best-Jaro"],
+  "requirements": [],
+  "iot_class": "local_polling",
+  "homeassistant": "2023.1.0"
+}

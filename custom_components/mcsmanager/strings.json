@@ -1,0 +1,23 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "MCSManager Connection",
+        "description": "Enter your MCSManager panel details.",
+        "data": {
+          "host": "Panel URL (e.g. http://192.168.1.100:23333)",
+          "api_key": "API Key",
+          "remote_uuid": "Daemon Remote UUID",
+          "instance_uuid": "Instance UUID"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot connect to MCSManager. Check host and API key.",
+      "invalid_response": "Unexpected response from MCSManager API."
+    },
+    "abort": {
+      "already_configured": "This instance is already configured."
+    }
+  }
+}
