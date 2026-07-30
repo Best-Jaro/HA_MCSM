@@ -4,13 +4,13 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .const import CONF_API_KEY, CONF_HOST, CONF_INSTANCE_UUID, CONF_REMOTE_UUID, DOMAIN
+from .const import CONF_API_KEY, CONF_HOST, CONF_INSTANCE_UUID, CONF_DAEMON_ID, DOMAIN
 
 DATA_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_HOST): str,
         vol.Required(CONF_API_KEY): str,
-        vol.Required(CONF_REMOTE_UUID): str,
+        vol.Required(CONF_DAEMON_ID): str,
         vol.Required(CONF_INSTANCE_UUID): str,
     }
 )
@@ -24,16 +24,17 @@ class MCSManagerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             await self.async_set_unique_id(
-                f"{user_input[CONF_REMOTE_UUID]}_{user_input[CONF_INSTANCE_UUID]}"
+                f"{user_input[CONF_DAEMON_ID]}_{user_input[CONF_INSTANCE_UUID]}"
             )
             self._abort_if_unique_id_configured()
 
             try:
                 session = async_get_clientsession(self.hass)
+                host = user_input[CONF_HOST].rstrip("/")
                 url = (
-                    f"{user_input[CONF_HOST].rstrip('/')}/api/protected_instance/detail"
+                    f"{host}/api/instance/"
                     f"?apikey={user_input[CONF_API_KEY]}"
-                    f"&remote_uuid={user_input[CONF_REMOTE_UUID]}"
+                    f"&daemonId={user_input[CONF_DAEMON_ID]}"
                     f"&uuid={user_input[CONF_INSTANCE_UUID]}"
                 )
                 async with session.get(url, timeout=10) as resp:

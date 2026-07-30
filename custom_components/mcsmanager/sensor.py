@@ -30,22 +30,24 @@ def _get_status(data: dict) -> str:
 
 
 def _get_cpu(data: dict) -> float | None:
-    val = data.get("info", {}).get("cpu")
+    # info.cpuUsage — percentage float (e.g. 12.5)
+    val = data.get("info", {}).get("cpuUsage")
     return round(float(val), 1) if val is not None else None
 
 
 def _get_mem(data: dict) -> float | None:
-    val = data.get("info", {}).get("mem")
-    return round(float(val) / 1024, 2) if val is not None else None
+    # info.memoryUsage — bytes; convert to GB
+    val = data.get("info", {}).get("memoryUsage")
+    return round(float(val) / (1024 ** 3), 3) if val is not None else None
 
 
 def _get_players_current(data: dict) -> int | None:
-    val = data.get("info", {}).get("players", {}).get("current")
+    val = data.get("info", {}).get("currentPlayers")
     return int(val) if val is not None else None
 
 
 def _get_players_max(data: dict) -> int | None:
-    val = data.get("info", {}).get("players", {}).get("max")
+    val = data.get("info", {}).get("maxPlayers")
     return int(val) if val is not None else None
 
 

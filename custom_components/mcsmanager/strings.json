@@ -7,7 +7,7 @@
         "data": {
           "host": "Panel URL (e.g. http://192.168.1.100:23333)",
           "api_key": "API Key",
-          "remote_uuid": "Daemon Remote UUID",
+          "daemonId": "Daemon ID",
           "instance_uuid": "Instance UUID"
         }
       }

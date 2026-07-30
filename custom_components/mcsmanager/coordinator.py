@@ -11,7 +11,7 @@ from .const import (
     CONF_API_KEY,
     CONF_HOST,
     CONF_INSTANCE_UUID,
-    CONF_REMOTE_UUID,
+    CONF_DAEMON_ID,
     DOMAIN,
     SCAN_INTERVAL_SECONDS,
 )
@@ -23,7 +23,7 @@ class MCSManagerCoordinator(DataUpdateCoordinator):
     def __init__(self, hass: HomeAssistant, entry_data: dict) -> None:
         self._host = entry_data[CONF_HOST].rstrip("/")
         self._api_key = entry_data[CONF_API_KEY]
-        self._remote_uuid = entry_data[CONF_REMOTE_UUID]
+        self._daemon_id = entry_data[CONF_DAEMON_ID]
         self._instance_uuid = entry_data[CONF_INSTANCE_UUID]
         self._session = async_get_clientsession(hass)
 
@@ -38,33 +38,31 @@ class MCSManagerCoordinator(DataUpdateCoordinator):
     def instance_uuid(self) -> str:
         return self._instance_uuid
 
-    def _build_url(self, endpoint: str) -> str:
-        return (
-            f"{self._host}/api/protected_instance/{endpoint}"
-            f"?apikey={self._api_key}"
-            f"&remote_uuid={self._remote_uuid}"
-            f"&uuid={self._instance_uuid}"
-        )
+    def _base_params(self) -> str:
+        return f"apikey={self._api_key}&daemonId={self._daemon_id}&uuid={self._instance_uuid}"
 
     async def _async_update_data(self) -> dict:
+        # GET /api/instance/?daemonId=...&uuid=...&apikey=...
+        url = f"{self._host}/api/instance/?{self._base_params()}"
         try:
-            async with self._session.get(
-                self._build_url("detail"), timeout=10
-            ) as resp:
+            async with self._session.get(url, timeout=10) as resp:
                 resp.raise_for_status()
                 payload = await resp.json()
         except Exception as err:
             raise UpdateFailed(f"MCSManager API error: {err}") from err
 
-        data = payload.get("data", {})
+        # Response: { status: 200, data: { instanceUuid, status, info: {...}, config: {...} } }
+        data = payload.get("data") if isinstance(payload, dict) else None
         if not data:
-            raise UpdateFailed("Empty data in MCSManager response")
+            raise UpdateFailed(f"Empty or invalid MCSManager response: {payload}")
         return data
 
     async def async_start_instance(self) -> None:
-        async with self._session.get(self._build_url("open"), timeout=10) as resp:
+        url = f"{self._host}/api/protected_instance/open?{self._base_params()}"
+        async with self._session.get(url, timeout=10) as resp:
             resp.raise_for_status()
 
     async def async_stop_instance(self) -> None:
-        async with self._session.get(self._build_url("stop"), timeout=10) as resp:
+        url = f"{self._host}/api/protected_instance/stop?{self._base_params()}"
+        async with self._session.get(url, timeout=10) as resp:
             resp.raise_for_status()

@@ -2,7 +2,7 @@ DOMAIN = "mcsmanager"
 
 CONF_HOST = "host"
 CONF_API_KEY = "api_key"
-CONF_REMOTE_UUID = "remote_uuid"
+CONF_DAEMON_ID = "daemonId"
 CONF_INSTANCE_UUID = "instance_uuid"
 
 SCAN_INTERVAL_SECONDS = 10
